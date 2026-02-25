@@ -1,7 +1,50 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Image from 'next/image';
 
 export default function Home() {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!name.trim() || !email.trim()) {
+            setMessage('Please fill in all fields');
+            return;
+        }
+
+        setLoading(true);
+        setMessage('');
+
+        try {
+            const response = await fetch('/api/save-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setMessage('Successfully joined the Founding Shawlyf Circle!');
+                setName('');
+                setEmail('');
+            } else {
+                setMessage(data.error || 'Failed to save email. Please try again.');
+            }
+        } catch (error) {
+            setMessage('An error occurred. Please try again.');
+            console.error('Error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <main className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black text-white">
             {/* Background Image */}
@@ -31,20 +74,50 @@ export default function Home() {
                     </span>
                 </h2>
 
-                {/* Email Input Form styled like Raw Mango / premium brands */}
-                <div className="w-full max-w-md mt-8 mb-12 flex flex-col gap-4">
+                {/* Form styled like Raw Mango / premium brands */}
+                <form onSubmit={handleSubmit} className="w-full max-w-md mt-8 mb-12 flex flex-col gap-4">
+                    {/* Name Input */}
+                    <div className="relative w-full border-b border-white/50 pb-2 flex items-center transition-colors focus-within:border-white">
+                        <input
+                            type="text"
+                            placeholder="Full Name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full bg-transparent outline-none text-white placeholder:text-white/50 text-base font-light px-2"
+                            required
+                        />
+                    </div>
+
+                    {/* Email Input */}
                     <div className="relative w-full border-b border-white/50 pb-2 flex items-center transition-colors focus-within:border-white">
                         <input
                             type="email"
                             placeholder="Email Address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="w-full bg-transparent outline-none text-white placeholder:text-white/50 text-base font-light px-2"
                             required
                         />
-                        <button className="text-xs tracking-widest uppercase hover:text-white/80 transition-colors px-2 font-medium">
-                            Join
+                        <button 
+                            type="submit" 
+                            disabled={loading}
+                            className="text-xs tracking-widest uppercase hover:text-white/80 transition-colors px-2 font-medium disabled:opacity-50"
+                        >
+                            {loading ? 'Joining...' : 'Join'}
                         </button>
                     </div>
-                </div>
+
+                    {/* Status Message */}
+                    {message && (
+                        <p className={`text-sm text-center transition-colors ${
+                            message.includes('Successfully') 
+                                ? 'text-green-400' 
+                                : 'text-red-400'
+                        }`}>
+                            {message}
+                        </p>
+                    )}
+                </form>
 
                 {/* Description Text matching user requirements */}
                 <div className="mt-auto md:mt-12 text-center max-w-xl mx-auto backdrop-blur-sm bg-black/10 p-6 rounded-lg border border-white/10">
