@@ -1,32 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server';
-import mongoose from 'mongoose';
+import { NextRequest, NextResponse } from "next/server";
+import mongoose, { Schema, Model, Document } from "mongoose";
+import { z } from "zod";
 
+// ==============================
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || '';
+// ==============================
+
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 let isConnected = false;
 
 async function connectToDatabase() {
-    if (isConnected) {
-        return;
-    }
+    if (isConnected) return;
 
     if (!MONGODB_URI) {
-        throw new Error('MONGODB_URI is not defined in environment variables');
+        throw new Error("MONGODB_URI is not defined in environment variables");
     }
 
     try {
         await mongoose.connect(MONGODB_URI);
         isConnected = true;
-        console.log('Connected to MongoDB');
+        console.log("Connected to MongoDB");
     } catch (error) {
-        console.error('MongoDB connection error:', error);
+        console.error("MongoDB connection error:", error);
         throw error;
     }
 }
 
-// Define the schema for the email signup
-const emailSignupSchema = new mongoose.Schema(
+// ==============================
+// Zod Validation Schema
+// ==============================
+
+const EmailSignupValidationSchema = z.object({
+    name: z.string().min(1, "Name is required").trim(),
+
+    email: z.string().email("Invalid email format").trim().toLowerCase(),
+});
+
+// Optional: inferred type from Zod
+type EmailSignupInput = z.infer<typeof EmailSignupValidationSchema>;
+
+// ==============================
+// Mongoose Type Definition
+// ==============================
+
+interface IEmailSignup extends Document {
+    name: string;
+    email: string;
+    createdAt: Date;
+}
+
+// ==============================
+// Mongoose Schema
+// ==============================
+
+const emailSignupSchema = new Schema<IEmailSignup>(
     {
         name: {
             type: String,
@@ -48,45 +76,48 @@ const emailSignupSchema = new mongoose.Schema(
     { timestamps: false }
 );
 
-// Create or get the model
-const EmailSignup = mongoose.models.EmailSignup || mongoose.model('EmailSignup', emailSignupSchema);
+// ==============================
+// Model (Properly Typed)
+// ==============================
+
+const EmailSignup: Model<IEmailSignup> =
+    (mongoose.models.EmailSignup as Model<IEmailSignup>) ||
+    mongoose.model<IEmailSignup>("EmailSignup", emailSignupSchema);
+
+// ==============================
+// POST Handler
+// ==============================
 
 export async function POST(request: NextRequest) {
     try {
-        // Connect to database
         await connectToDatabase();
 
-        // Parse request body
         const body = await request.json();
-        const { name, email } = body;
 
-        // Validate input
-        if (!name || !email) {
+        // 🔥 Zod Validation
+        const parsed = EmailSignupValidationSchema.safeParse(body);
+
+        if (!parsed.success) {
             return NextResponse.json(
-                { error: 'Name and email are required' },
+                {
+                    error: parsed.error.issues[0].message,
+                },
                 { status: 400 }
             );
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return NextResponse.json(
-                { error: 'Invalid email format' },
-                { status: 400 }
-            );
-        }
+        // Cleaned & validated data
+        const { name, email }: EmailSignupInput = parsed.data;
 
-        // Check if email already exists
         const existingSignup = await EmailSignup.findOne({ email });
+
         if (existingSignup) {
             return NextResponse.json(
-                { error: 'This email is already registered' },
+                { error: "This email is already registered" },
                 { status: 409 }
             );
         }
 
-        // Create new document
         const newSignup = await EmailSignup.create({
             name,
             email,
@@ -95,7 +126,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(
             {
-                message: 'Successfully saved to Founding Shawlyf Circle',
+                message: "Successfully saved to Founding Shawlyf Circle",
                 data: {
                     _id: newSignup._id,
                     name: newSignup.name,
@@ -107,6 +138,7 @@ export async function POST(request: NextRequest) {
         );
     } catch (error: unknown) {
         console.error("API Error:", error);
+
         if (
             typeof error === "object" &&
             error !== null &&
@@ -124,5 +156,4 @@ export async function POST(request: NextRequest) {
             { status: 500 }
         );
     }
-    
 }
