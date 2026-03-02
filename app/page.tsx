@@ -1,132 +1,114 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
+import Navbar from "./(main)/_components/Navbar";
+import PopupModal from "./(main)/_components/PopupModal";
+import { Libre_Baskerville } from "next/font/google";
+import { Instagram, Twitter } from "lucide-react";
+
+const libre = Libre_Baskerville({
+    subsets: ["latin"],
+    weight: ["400", "700"],
+});
 
 export default function Home() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        if (!name.trim() || !email.trim()) {
-            setMessage('Please fill in all fields');
-            return;
-        }
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-        setLoading(true);
-        setMessage('');
+    useEffect(() => {
+        const timer = setTimeout(() => setIsModalOpen(true), 5000);
+        return () => clearTimeout(timer);
+    }, []);
 
-        try {
-            const response = await fetch('/api/save-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name, email }),
-            });
+    const handleCloseModal = useCallback(() => {
+        setIsModalOpen(false);
+    }, []);
 
-            const data = await response.json();
-
-            if (response.ok) {
-                setMessage('Successfully joined the Founding Shawlyf Circle!');
-                setName('');
-                setEmail('');
-            } else {
-                setMessage(data.error || 'Failed to save email. Please try again.');
-            }
-        } catch (error) {
-            setMessage('An error occurred. Please try again.');
-            console.error('Error:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const handleOpenModal = useCallback(() => {
+        setIsModalOpen(true);
+    }, []);
 
     return (
-        <main className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black text-white">
-            {/* Background Image */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src="/bg.png"
-                    alt="Aesthetic Background"
-                    fill
-                    className="object-cover object-center w-full h-full opacity-60"
-                    priority
-                />
-            </div>
+        <main className="bg-white min-h-screen">
+            <Navbar onRegisterClick={handleOpenModal} />
 
-            {/* Aesthetic Top Navigation/Logo area */}
-            <header className="absolute top-0 w-full p-8 z-10 flex justify-center tracking-widest text-sm md:text-base font-light">
-                <h1>SHAWLYF</h1>
-            </header>
+            {/* HERO SECTION */}
+            <section className="pt-24 pb-16">
+                {/* Centered Container */}
+                <div className="max-w-[1500px] mx-auto px-6">
+                    <div className="relative w-full h-[80vh] overflow-hidden">
+                        {/* Mobile Image */}
+                        <div className="block md:hidden absolute inset-0">
+                            <Image
+                                src="/bg-mobile.png"
+                                alt="Mobile Hero"
+                                fill
+                                priority
+                                className="object-contain object-center"
+                            />
+                        </div>
 
-            {/* Content Overlay */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 max-w-3xl mt-20">
+                        {/* Desktop Image */}
+                        <div className="hidden md:block absolute inset-0">
+                            <Image
+                                src="/SHAWL.png"
+                                alt="Desktop Hero"
+                                fill
+                                priority
+                                className="object-cover object-top"
+                            />
+                        </div>
 
-                {/* Main Heading */}
-                <h2 className="text-3xl md:text-5xl font-light tracking-wide mb-6 leading-tight font-serif text-white/95">
-                    We&apos;ll be live soon.<br />
-                    <span className="text-xl md:text-2xl opacity-80 mt-4 block font-sans font-light">
-                        But you can still request to join the <br className="md:hidden" />&quot;Founding Shawlyf Circle&quot;
-                    </span>
-                </h2>
+                        {/* Text Overlay */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20">
+                            <h1
+                                className={`${libre.className} text-white text-5xl md:text-7xl lg:text-8xl tracking-[0.15em] md:tracking-[0.35em]`}
+                            >
+                                SHAWLYF
+                            </h1>
 
-                {/* Form styled like Raw Mango / premium brands */}
-                <form onSubmit={handleSubmit} className="w-full max-w-md mt-8 mb-12 flex flex-col gap-4">
-                    {/* Name Input */}
-                    <div className="relative w-full border-b border-white/50 pb-2 flex items-center transition-colors focus-within:border-white">
-                        <input
-                            type="text"
-                            placeholder="Full Name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-transparent outline-none text-white placeholder:text-white/50 text-base font-light px-2"
-                            required
-                        />
+                            <p
+                                className={`${libre.className} mt-6 text-white text-sm md:text-base tracking-[0.5em]`}
+                            >
+                                COMING SOON
+                            </p>
+                        </div>
                     </div>
+                </div>
+            </section>
 
-                    {/* Email Input */}
-                    <div className="relative w-full border-b border-white/50 pb-2 flex items-center transition-colors focus-within:border-white">
-                        <input
-                            type="email"
-                            placeholder="Email Address"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-transparent outline-none text-white placeholder:text-white/50 text-base font-light px-2"
-                            required
-                        />
-                        <button 
-                            type="submit" 
-                            disabled={loading}
-                            className="text-xs tracking-widest uppercase hover:text-white/80 transition-colors px-2 font-medium disabled:opacity-50"
-                        >
-                            {loading ? 'Joining...' : 'Join'}
-                        </button>
-                    </div>
-
-                    {/* Status Message */}
-                    {message && (
-                        <p className={`text-sm text-center transition-colors ${
-                            message.includes('Successfully') 
-                                ? 'text-green-400' 
-                                : 'text-red-400'
-                        }`}>
-                            {message}
-                        </p>
-                    )}
-                </form>
-
-                {/* Description Text matching user requirements */}
-                <div className="mt-auto md:mt-12 text-center max-w-xl mx-auto backdrop-blur-sm bg-black/10 p-6 rounded-lg border border-white/10">
-                    <p className="text-sm md:text-base font-light leading-relaxed text-white/80">
-                        Only a chosen group of fashion passionate people, artists and marketers will be getting access where the brand will directly interact with them and talk to them while building the brand.
+            {/* WHITE SPACE SECTION BELOW */}
+            <section className="py-40 px-6 text-center bg-white">
+                <div className="max-w-2xl mx-auto">
+                    <p
+                        className={`${libre.className} text-lg md:text-xl leading-relaxed text-neutral-800`}
+                    >
+                        Shawlyf is a quiet expression of modern identity —
+                        crafted for those who move with intention, confidence,
+                        and understated power.
                     </p>
                 </div>
 
-            </div>
+                <div className="mt-14 flex justify-center gap-8">
+                    <a
+                        href="https://www.instagram.com/houseofshawlyf/"
+                        className="text-neutral-600 hover:text-black transition-colors"
+                        aria-label="Instagram"
+                    >
+                        <Instagram size={40} strokeWidth={1.5} />
+                    </a>
+
+                    <a
+                        href="https://x.com/shawlifelab?s=21"
+                        className="text-neutral-600 hover:text-black transition-colors"
+                        aria-label="Twitter"
+                    >
+                        <Twitter size={40} strokeWidth={1.5} />
+                    </a>
+                </div>
+            </section>
+
+            <PopupModal isOpen={isModalOpen} onClose={handleCloseModal} />
         </main>
     );
 }
