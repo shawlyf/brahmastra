@@ -36,7 +36,7 @@ export default function Home() {
             <section className="pt-24 pb-16">
                 {/* Centered Container */}
                 <div className="max-w-[1500px] mx-auto px-6">
-                    <div className="relative w-full h-[80vh] overflow-hidden">
+                    <div className="relative w-full h-[70vh] overflow-hidden">
                         {/* Mobile Image */}
                         <div className="block md:hidden absolute inset-0">
                             <Image
@@ -51,11 +51,11 @@ export default function Home() {
                         {/* Desktop Image */}
                         <div className="hidden md:block absolute inset-0">
                             <Image
-                                src="/SHAWL.png"
+                                src="/testxyz.JPG"
                                 alt="Desktop Hero"
                                 fill
                                 priority
-                                className="object-cover object-top"
+                                className="object-cover object-center"
                             />
                         </div>
 
@@ -78,10 +78,10 @@ export default function Home() {
             </section>
 
             {/* WHITE SPACE SECTION BELOW */}
-            <section className="py-40 px-6 text-center bg-white">
+            <section className="py-10 px-6 text-center bg-white">
                 <div className="max-w-2xl mx-auto">
                     <p
-                        className={`${libre.className} text-lg md:text-xl leading-relaxed text-neutral-800`}
+                        className={`${libre.className} text-lg md:text-xl leading-relaxed text-[rgba(36,58,37)]`}
                     >
                         Shawlyf is a quiet expression of modern identity —
                         crafted for those who move with intention, confidence,
@@ -92,7 +92,7 @@ export default function Home() {
                 <div className="mt-14 flex justify-center gap-8">
                     <a
                         href="https://www.instagram.com/houseofshawlyf/"
-                        className="text-neutral-600 hover:text-black transition-colors"
+                        className="text-[rgba(36,58,37)] hover:text-black transition-colors"
                         aria-label="Instagram"
                     >
                         <Instagram size={40} strokeWidth={1.5} />
@@ -100,7 +100,7 @@ export default function Home() {
 
                     <a
                         href="https://x.com/shawlifelab?s=21"
-                        className="text-neutral-600 hover:text-black transition-colors"
+                        className="text-[rgba(36,58,37)] hover:text-black transition-colors"
                         aria-label="Twitter"
                     >
                         <Twitter size={40} strokeWidth={1.5} />

@@ -118,16 +118,16 @@ export default function PopupModal({ isOpen, onClose }: PopupModalProps) {
                         onClick={handleSubmit}
                         disabled={loading}
                         className="
-              mt-6
-              py-3
-              border border-white/60
-              text-white
-              text-xs
-              tracking-[0.35em]
-              uppercase
-              hover:bg-white/10
-              transition-colors
-              disabled:opacity-50
+                    mt-6
+                    py-3
+                    border border-white/60
+                    text-white
+                    text-xs
+                    tracking-[0.35em]
+                    uppercase
+                    hover:bg-white/10
+                    transition-colors
+                    disabled:opacity-50
             "
                     >
                         {loading ? "JOINING..." : "I BELONG HERE"}
