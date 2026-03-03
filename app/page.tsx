@@ -35,7 +35,7 @@ export default function Home() {
             {/* HERO SECTION */}
             <section className="pt-24 pb-16">
                 {/* Centered Container */}
-                <div className="max-w-[1500px] mx-auto px-6">
+                <div className="max-w-7xl mx-auto px-6">
                     <div className="relative w-full h-[70vh] overflow-hidden">
                         {/* Mobile Image */}
                         <div className="block md:hidden absolute inset-0">
@@ -51,7 +51,7 @@ export default function Home() {
                         {/* Desktop Image */}
                         <div className="hidden md:block absolute inset-0">
                             <Image
-                                src="/testxyz.JPG"
+                                src="/bg.jpg"
                                 alt="Desktop Hero"
                                 fill
                                 priority
