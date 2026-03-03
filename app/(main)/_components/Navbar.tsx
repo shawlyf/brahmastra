@@ -13,16 +13,15 @@ export default function Navbar({ onRegisterClick }: NavbarProps) {
             fixed top-0 left-0 w-full z-30
             px-8 py-4 h-25
             flex items-center justify-between
-            bg-[rgba(111,143,175,0.30)] backdrop-blur-md
-            border-b border-white/20
-        "
+            bg-[rgba(240,238,233,0.30)] backdrop-blur-md
+            border-b border-white/20"
         >
             {/* Logo */}
             <Image
                 src="/logo.png"
                 alt="Shawlyf Logo"
-                width={110}
-                height={40}
+                width={50}
+                height={10}
                 className="object-contain"
                 priority
             />
@@ -38,11 +37,12 @@ export default function Navbar({ onRegisterClick }: NavbarProps) {
                     text-xs
                     tracking-[0.25em]
                     uppercase
-                    hover:bg-white/10
+                    bg-[rgba(36,58,37)]
+                    hover:bg-[rgba(36,58,37,0.8)]
                     transition-colors
                 "
             >
-                Register
+                Join Waitlist
             </button>
         </nav>
     );
